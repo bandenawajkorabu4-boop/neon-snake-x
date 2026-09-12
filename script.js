@@ -1,1317 +1,765 @@
-const API_URL = "/api/response";
-
-/* ==============================
-   SESSION
-============================== */
-
-let sessionId = localStorage.getItem("sruSessionId");
-
-if (!sessionId) {
-    sessionId =
-        "sru-" +
-        Date.now().toString(36) +
-        "-" +
-        Math.random().toString(36).substring(2, 8);
-
-    localStorage.setItem("sruSessionId", sessionId);
-}
+/* =========================================================
+   BANDENAWAZ KORABU PORTFOLIO
+   COMPLETE JAVASCRIPT
+========================================================= */
 
 
-/* ==============================
-   ELEMENTS
-============================== */
+/* =========================================================
+   MOBILE MENU
+========================================================= */
 
-const card = document.getElementById("card");
-const title = document.getElementById("title");
-const description = document.getElementById("description");
-const content = document.getElementById("content");
-const warning = document.getElementById("warning");
-const startButton = document.getElementById("startButton");
+const menuBtn = document.getElementById("menuBtn");
+const navMenu = document.getElementById("navMenu");
 
+if (menuBtn && navMenu) {
 
-/* ==============================
-   SAVE RESPONSE
-============================== */
+    menuBtn.addEventListener("click", () => {
 
-async function saveResponse(question, answer) {
+        navMenu.classList.toggle("active");
 
-    try {
+        if (navMenu.classList.contains("active")) {
 
-        await fetch(API_URL, {
-            method: "POST",
+            menuBtn.textContent = "✕";
 
-            headers: {
-                "Content-Type": "application/json"
-            },
+        } else {
 
-            body: JSON.stringify({
-                sessionId,
-                question,
-                answer
-            })
-        });
-
-    } catch (error) {
-
-        console.log(
-            "Response could not be saved:",
-            error
-        );
-
-    }
-
-}
-
-
-/* ==============================
-   TYPING EFFECT
-============================== */
-
-function typeText(element, text, speed = 25) {
-
-    return new Promise(resolve => {
-
-        element.innerHTML = "";
-
-        let index = 0;
-
-        function type() {
-
-            if (index < text.length) {
-
-                element.innerHTML +=
-                    text.charAt(index);
-
-                index++;
-
-                setTimeout(type, speed);
-
-            } else {
-
-                resolve();
-
-            }
+            menuBtn.textContent = "☰";
 
         }
 
-        type();
+    });
+
+
+    const navLinks =
+        document.querySelectorAll("#navMenu a");
+
+
+    navLinks.forEach(link => {
+
+        link.addEventListener("click", () => {
+
+            navMenu.classList.remove("active");
+
+            menuBtn.textContent = "☰";
+
+        });
 
     });
 
 }
 
 
-/* ==============================
-   SCREEN TRANSITION
-============================== */
+/* =========================================================
+   CURRENT YEAR
+========================================================= */
 
-function changeScreen(callback) {
+const yearElement =
+    document.getElementById("year");
 
-    card.style.opacity = "0";
-    card.style.transform =
-        "translateY(20px) scale(.98)";
+if (yearElement) {
 
-    setTimeout(() => {
-
-        callback();
-
-        card.style.opacity = "1";
-        card.style.transform =
-            "translateY(0) scale(1)";
-
-    }, 350);
+    yearElement.textContent =
+        new Date().getFullYear();
 
 }
 
 
-/* ==============================
-   PARTICLES
-============================== */
+/* =========================================================
+   SCROLL REVEAL
+========================================================= */
 
-function createParticles(amount = 18) {
+const revealElements =
+    document.querySelectorAll(
+        ".skill-card, .project-card, .stat, .contact-box"
+    );
 
-    for (let i = 0; i < amount; i++) {
 
-        const particle =
-            document.createElement("div");
+const revealObserver =
+    new IntersectionObserver(
+        (entries) => {
 
-        particle.className =
-            "particle";
+            entries.forEach(entry => {
 
-        particle.style.left =
-            Math.random() * 100 + "%";
+                if (entry.isIntersecting) {
 
-        particle.style.top =
-            Math.random() * 100 + "%";
+                    entry.target.style.opacity = "1";
 
-        particle.style.animationDelay =
-            Math.random() * 3 + "s";
+                    entry.target.style.transform =
+                        "translateY(0)";
 
-        particle.style.animationDuration =
-            3 + Math.random() * 4 + "s";
+                    revealObserver.unobserve(
+                        entry.target
+                    );
 
-        document.body.appendChild(particle);
+                }
+
+            });
+
+        },
+        {
+            threshold: 0.12
+        }
+    );
+
+
+revealElements.forEach((element, index) => {
+
+    element.style.opacity = "0";
+
+    element.style.transform =
+        "translateY(30px)";
+
+    element.style.transition =
+        `opacity 0.7s ease ${index * 0.05}s,
+         transform 0.7s ease ${index * 0.05}s`;
+
+    revealObserver.observe(element);
+
+});
+
+
+/* =========================================================
+   ACTIVE NAVIGATION
+========================================================= */
+
+const sections =
+    document.querySelectorAll(
+        "main section[id]"
+    );
+
+const navigationLinks =
+    document.querySelectorAll(
+        ".navbar nav a"
+    );
+
+
+const navObserver =
+    new IntersectionObserver(
+        (entries) => {
+
+            entries.forEach(entry => {
+
+                if (entry.isIntersecting) {
+
+                    navigationLinks.forEach(link => {
+
+                        link.classList.remove("active");
+
+                    });
+
+
+                    const activeLink =
+                        document.querySelector(
+                            `.navbar nav a[href="#${entry.target.id}"]`
+                        );
+
+
+                    if (activeLink) {
+
+                        activeLink.classList.add(
+                            "active"
+                        );
+
+                    }
+
+                }
+
+            });
+
+        },
+        {
+            threshold: 0.45
+        }
+    );
+
+
+sections.forEach(section => {
+
+    navObserver.observe(section);
+
+});
+
+
+/* =========================================================
+   TYPING EFFECT
+========================================================= */
+
+const typingTarget =
+    document.querySelector(".hero h2");
+
+
+if (typingTarget) {
+
+    const originalText =
+        typingTarget.textContent.trim();
+
+
+    /*
+       Keep the HTML structure visually clean.
+       The effect cycles through developer roles.
+    */
+
+    const roles = [
+        "Software & Web Developer",
+        "BE CSE Student",
+        "Web Application Developer",
+        "AI Enthusiast"
+    ];
+
+
+    let roleIndex = 0;
+
+    let characterIndex = 0;
+
+    let deleting = false;
+
+
+    function typeRole() {
+
+        const currentRole =
+            roles[roleIndex];
+
+
+        if (!deleting) {
+
+            characterIndex++;
+
+        } else {
+
+            characterIndex--;
+
+        }
+
+
+        typingTarget.innerHTML =
+            currentRole.substring(
+                0,
+                characterIndex
+            );
+
+
+        let speed =
+            deleting ? 45 : 80;
+
+
+        if (
+            !deleting &&
+            characterIndex ===
+            currentRole.length
+        ) {
+
+            speed = 1800;
+
+            deleting = true;
+
+        }
+
+
+        if (
+            deleting &&
+            characterIndex === 0
+        ) {
+
+            deleting = false;
+
+            roleIndex =
+                (roleIndex + 1) %
+                roles.length;
+
+            speed = 400;
+
+        }
+
+
+        setTimeout(
+            typeRole,
+            speed
+        );
 
     }
 
+
+    /*
+       Start after page loads.
+    */
+
+    setTimeout(
+        typeRole,
+        1000
+    );
+
 }
 
 
-/* ==============================
-   CHOICE BUTTONS
-============================== */
+/* =========================================================
+   TERMINAL TYPING CURSOR
+========================================================= */
 
-function showChoices(question, choices, callback) {
-
-    content.innerHTML = "";
-
-    const container =
-        document.createElement("div");
-
-    container.className =
-        "choice-container";
+const terminal =
+    document.querySelector(".terminal");
 
 
-    choices.forEach(choice => {
+if (terminal) {
 
-        const button =
-            document.createElement("button");
+    terminal.addEventListener(
+        "mouseenter",
+        () => {
 
-        button.className =
-            "choice-button";
+            terminal.style.transform =
+                "translateY(-4px)";
 
-        button.textContent =
-            choice.text;
+            terminal.style.transition =
+                "transform 0.3s ease";
+
+        }
+    );
 
 
-        button.addEventListener(
-            "click",
-            async () => {
+    terminal.addEventListener(
+        "mouseleave",
+        () => {
 
-                if (button.disabled) {
-                    return;
-                }
+            terminal.style.transform =
+                "translateY(0)";
 
-                button.disabled = true;
+        }
+    );
 
-                await saveResponse(
-                    question,
-                    choice.text
-                );
+}
 
-                changeScreen(() => {
 
-                    callback(choice);
+/* =========================================================
+   STAT COUNTER ANIMATION
+========================================================= */
 
-                });
+const stats =
+    document.querySelectorAll(
+        ".stat strong"
+    );
+
+
+function animateCounter(element) {
+
+    const text =
+        element.textContent.trim();
+
+
+    /*
+       Do not animate infinity.
+    */
+
+    if (text === "∞") {
+
+        return;
+
+    }
+
+
+    const numericValue =
+        parseInt(
+            text.replace(/\D/g, ""),
+            10
+        );
+
+
+    if (
+        isNaN(numericValue)
+    ) {
+
+        return;
+
+    }
+
+
+    let current = 0;
+
+
+    const suffix =
+        text.includes("+")
+            ? "+"
+            : "";
+
+
+    const duration = 1000;
+
+    const steps = 30;
+
+    const increment =
+        numericValue / steps;
+
+
+    const interval =
+        duration / steps;
+
+
+    const timer =
+        setInterval(() => {
+
+            current += increment;
+
+
+            if (
+                current >=
+                numericValue
+            ) {
+
+                current =
+                    numericValue;
+
+                clearInterval(timer);
 
             }
-        );
 
 
-        container.appendChild(button);
+            element.textContent =
+                Math.floor(current) +
+                suffix;
 
-    });
-
-
-    content.appendChild(container);
+        }, interval);
 
 }
 
 
-/* ==============================
-   START
-============================== */
+const statsObserver =
+    new IntersectionObserver(
+        entries => {
 
-startButton.addEventListener(
-    "click",
-    async () => {
+            entries.forEach(entry => {
 
-        startButton.disabled = true;
+                if (
+                    entry.isIntersecting
+                ) {
 
-        await saveResponse(
-            "start",
-            "Clicked Okay, tell me 👀"
-        );
+                    const stat =
+                        entry.target;
 
-        showQuestionOne();
+                    animateCounter(stat);
+
+                    statsObserver.unobserve(
+                        stat
+                    );
+
+                }
+
+            });
+
+        },
+        {
+            threshold: 0.8
+        }
+    );
+
+
+stats.forEach(stat => {
+
+    statsObserver.observe(stat);
+
+});
+
+
+/* =========================================================
+   SCROLL TO TOP BUTTON
+========================================================= */
+
+const topButton =
+    document.createElement("button");
+
+
+topButton.innerHTML =
+    "↑";
+
+
+topButton.setAttribute(
+    "aria-label",
+    "Scroll to top"
+);
+
+
+topButton.id =
+    "scrollTopButton";
+
+
+document.body.appendChild(
+    topButton
+);
+
+
+/* BUTTON STYLE */
+
+Object.assign(
+    topButton.style,
+    {
+
+        position: "fixed",
+
+        right: "25px",
+
+        bottom: "25px",
+
+        width: "45px",
+
+        height: "45px",
+
+        border: "1px solid rgba(118,92,255,0.4)",
+
+        borderRadius: "10px",
+
+        background: "rgba(10,15,25,0.9)",
+
+        color: "#a18fff",
+
+        fontSize: "20px",
+
+        cursor: "pointer",
+
+        display: "flex",
+
+        alignItems: "center",
+
+        justifyContent: "center",
+
+        opacity: "0",
+
+        visibility: "hidden",
+
+        transform: "translateY(15px)",
+
+        transition: "0.3s ease",
+
+        zIndex: "999"
+
+    }
+
+);
+
+
+/* SHOW / HIDE */
+
+window.addEventListener(
+    "scroll",
+    () => {
+
+        if (
+            window.scrollY > 500
+        ) {
+
+            topButton.style.opacity =
+                "1";
+
+            topButton.style.visibility =
+                "visible";
+
+            topButton.style.transform =
+                "translateY(0)";
+
+        } else {
+
+            topButton.style.opacity =
+                "0";
+
+            topButton.style.visibility =
+                "hidden";
+
+            topButton.style.transform =
+                "translateY(15px)";
+
+        }
 
     }
 );
 
 
-/* ==============================
-   QUESTION 1
-============================== */
+/* CLICK */
 
-function showQuestionOne() {
+topButton.addEventListener(
+    "click",
+    () => {
 
-    changeScreen(async () => {
+        window.scrollTo({
 
-        title.innerHTML =
-            "Okay Sru... 👀";
+            top: 0,
 
-        description.innerHTML = "";
+            behavior: "smooth"
 
-        content.innerHTML = "";
-
-        warning.style.display =
-            "none";
-
-        startButton.style.display =
-            "none";
-
-
-        await typeText(
-            description,
-            "Before I say anything important, I need to know what kind of person I'm dealing with.",
-            24
-        );
-
-
-        showChoices(
-
-            "Which one are you?",
-
-            [
-                {
-                    text: "😇 I'm innocent",
-
-                    result:
-                        "That's cute. I don't believe you though."
-                },
-
-                {
-                    text: "😏 I'm trouble",
-
-                    result:
-                        "Honestly Sru, I suspected that from the beginning."
-                }
-            ],
-
-            choice => {
-
-                showQuestionTwo(
-                    choice.result
-                );
-
-            }
-
-        );
-
-    });
-
-}
-
-
-/* ==============================
-   QUESTION 2
-============================== */
-
-function showQuestionTwo(previousResult) {
-
-    changeScreen(async () => {
-
-        title.innerHTML =
-            "Interesting... 😌";
-
-        description.innerHTML = "";
-
-        content.innerHTML = "";
-
-
-        await typeText(
-            description,
-            previousResult +
-            " Anyway, one more completely normal question.",
-            24
-        );
-
-
-        showChoices(
-
-            "Do you know that you're cute?",
-
-            [
-                {
-                    text: "😌 Obviously",
-
-                    result:
-                        "Wow. Confidence. I respect it."
-                },
-
-                {
-                    text: "🙄 No I'm not",
-
-                    result:
-                        "Sure Sru. And I'm a professional liar."
-                },
-
-                {
-                    text: "🤨 Who said I'm cute?",
-
-                    result:
-                        "Nobody. That's the problem. I was trying to."
-                }
-            ],
-
-            choice => {
-
-                showQuestionThree(
-                    choice.result
-                );
-
-            }
-
-        );
-
-    });
-
-}
-
-
-/* ==============================
-   QUESTION 3
-============================== */
-
-function showQuestionThree(previousResult) {
-
-    changeScreen(async () => {
-
-        title.innerHTML =
-            "Okay... serious question.";
-
-        description.innerHTML = "";
-
-        content.innerHTML = "";
-
-
-        await typeText(
-            description,
-            previousResult +
-            " But don't overthink this one.",
-            24
-        );
-
-
-        showChoices(
-
-            "Would you say yes if someone asked you something important?",
-
-            [
-                {
-                    text: "👀 Depends...",
-
-                    result:
-                        "Ah. The dangerous answer."
-                },
-
-                {
-                    text: "😌 Probably",
-
-                    result:
-                        "That's unexpectedly promising."
-                },
-
-                {
-                    text: "🙄 No",
-
-                    result:
-                        "Good to know. I'll pretend I didn't hear that."
-                }
-            ],
-
-            choice => {
-
-                showQuestionFour(
-                    choice.result
-                );
-
-            }
-
-        );
-
-    });
-
-}
-
-
-/* ==============================
-   QUESTION 4
-============================== */
-
-function showQuestionFour(previousResult) {
-
-    changeScreen(async () => {
-
-        title.innerHTML =
-            "Well then...";
-
-        description.innerHTML = "";
-
-        content.innerHTML = "";
-
-
-        await typeText(
-            description,
-            previousResult +
-            " There's actually something I've wanted to ask you for a while.",
-            24
-        );
-
-
-        showChoices(
-
-            "What should I do now?",
-
-            [
-                {
-                    text: "👀 Then ask me",
-
-                    result:
-                        "You really want me to say it?"
-                },
-
-                {
-                    text: "😂 Forget it",
-
-                    result:
-                        "Too late. Now I'm curious too."
-                }
-            ],
-
-            choice => {
-
-                showQuestionFive(
-                    choice.result
-                );
-
-            }
-
-        );
-
-    });
-
-}
-
-
-/* ==============================
-   QUESTION 5
-============================== */
-
-function showQuestionFive(previousResult) {
-
-    changeScreen(async () => {
-
-        title.innerHTML =
-            "Here's the thing...";
-
-        description.innerHTML = "";
-
-        content.innerHTML = "";
-
-
-        await typeText(
-            description,
-            previousResult +
-            " But I'm not going to ask.",
-            24
-        );
-
-
-        showChoices(
-
-            "Should I actually ask?",
-
-            [
-                {
-                    text: "😏 Yes. Ask.",
-
-                    result:
-                        "You literally asked me to. Don't blame me."
-                },
-
-                {
-                    text: "😂 No, you're joking",
-
-                    result:
-                        "Maybe I am. Maybe I'm not."
-                },
-
-                {
-                    text: "🙈 I'm scared now",
-
-                    result:
-                        "Perfect. That's exactly the reaction I wanted."
-                }
-            ],
-
-            choice => {
-
-                showProposal(
-                    choice.result
-                );
-
-            }
-
-        );
-
-    });
-
-}
-
-
-/* ==============================
-   PROPOSAL
-============================== */
-
-function showProposal(previousResult) {
-
-    changeScreen(async () => {
-
-        title.innerHTML =
-            "Sru ❤️ + Me?";
-
-        description.innerHTML = "";
-
-        content.innerHTML = "";
-
-
-        await typeText(
-            description,
-            previousResult +
-            " Okay... here's my question.",
-            27
-        );
-
-
-        await wait(400);
-
-
-        const question =
-            document.createElement("div");
-
-        question.style.fontSize =
-            "22px";
-
-        question.style.fontWeight =
-            "bold";
-
-        question.style.margin =
-            "20px 0";
-
-        question.style.lineHeight =
-            "1.5";
-
-        question.textContent =
-            "Will you be the person I get to annoy a little more than everyone else? 😌❤️";
-
-
-        content.appendChild(question);
-
-
-        const container =
-            document.createElement("div");
-
-        container.className =
-            "choice-container";
-
-
-        const maybe =
-            createChoiceButton(
-                "😏 Hmm... maybe"
-            );
-
-        const serious =
-            createChoiceButton(
-                "🤨 Are you seriously asking me?"
-            );
-
-        const joking =
-            createChoiceButton(
-                "😂 I think you're joking"
-            );
-
-        const no =
-            createChoiceButton(
-                "🙄 Absolutely not"
-            );
-
-
-        container.appendChild(maybe);
-        container.appendChild(serious);
-        container.appendChild(joking);
-        container.appendChild(no);
-
-        content.appendChild(container);
-
-
-        maybe.onclick = async () => {
-
-            await saveResponse(
-                "Sru ❤️ + Me?",
-                "😏 Hmm... maybe"
-            );
-
-            startConfessionMode("maybe");
-
-        };
-
-
-        serious.onclick = async () => {
-
-            await saveResponse(
-                "Sru ❤️ + Me?",
-                "🤨 Are you seriously asking me?"
-            );
-
-            startConfessionMode("serious");
-
-        };
-
-
-        joking.onclick = async () => {
-
-            await saveResponse(
-                "Sru ❤️ + Me?",
-                "😂 I think you're joking"
-            );
-
-            startConfessionMode("joking");
-
-        };
-
-
-        no.onclick = async () => {
-
-            await saveResponse(
-                "Sru ❤️ + Me?",
-                "🙄 Absolutely not"
-            );
-
-            startConfessionMode("no");
-
-        };
-
-
-        /* NO BUTTON DODGE */
-
-        let dodgeCount = 0;
-
-        function dodgeButton() {
-
-            if (dodgeCount >= 4) {
-                return;
-            }
-
-            dodgeCount++;
-
-            const x =
-                Math.random() * 180 - 90;
-
-            const y =
-                Math.random() * 120 - 60;
-
-            no.style.transform =
-                `translate(${x}px, ${y}px)`;
-
-        }
-
-
-        no.addEventListener(
-            "mouseenter",
-            dodgeButton
-        );
-
-        no.addEventListener(
-            "touchstart",
-            dodgeButton
-        );
-
-    });
-
-}
-
-
-/* ==============================
-   CREATE BUTTON
-============================== */
-
-function createChoiceButton(text) {
-
-    const button =
-        document.createElement("button");
-
-    button.className =
-        "choice-button";
-
-    button.textContent =
-        text;
-
-    return button;
-
-}
-
-
-/* ==============================
-   WAIT
-============================== */
-
-function wait(milliseconds) {
-
-    return new Promise(resolve => {
-
-        setTimeout(
-            resolve,
-            milliseconds
-        );
-
-    });
-
-}
-
-
-/* ==============================
-   CONFESSION MODE
-============================== */
-
-async function startConfessionMode(answerType) {
-
-    changeScreen(async () => {
-
-        title.innerHTML =
-            "WAIT... 👀";
-
-        description.innerHTML =
-            "";
-
-        content.innerHTML =
-            "";
-
-        warning.style.display =
-            "none";
-
-
-        /* Remove normal buttons */
-
-        await wait(500);
-
-
-        /* Dramatic pause */
-
-        await typeText(
-            description,
-            "Okay...",
-            180
-        );
-
-
-        await wait(1000);
-
-
-        description.innerHTML =
-            "";
-
-
-        await typeText(
-            description,
-            "Maybe I should actually tell you.",
-            65
-        );
-
-
-        await wait(1300);
-
-
-        description.innerHTML =
-            "";
-
-
-        await typeText(
-            description,
-            "For once, I'm not joking.",
-            65
-        );
-
-
-        await wait(1400);
-
-
-        showConfession(answerType);
-
-    });
-
-}
-
-
-/* ==============================
-   CONFESSION
-============================== */
-
-async function showConfession(answerType) {
-
-    changeScreen(async () => {
-
-        title.innerHTML =
-            "Sru... ❤️";
-
-        description.innerHTML =
-            "";
-
-        content.innerHTML =
-            "";
-
-
-        await typeText(
-            description,
-            "You probably figured this out already...",
-            50
-        );
-
-
-        await wait(1200);
-
-
-        description.innerHTML =
-            "";
-
-
-        await typeText(
-            description,
-            "but yes...",
-            90
-        );
-
-
-        await wait(1300);
-
-
-        description.innerHTML =
-            "";
-
-
-        const confession =
-            document.createElement("div");
-
-        confession.style.fontSize =
-            "21px";
-
-        confession.style.fontWeight =
-            "bold";
-
-        confession.style.lineHeight =
-            "1.7";
-
-        confession.style.margin =
-            "25px 0";
-
-        confession.style.opacity =
-            "0";
-
-        confession.style.transition =
-            "opacity 1s ease";
-
-
-        confession.innerHTML =
-            `
-            I actually like you. ❤️
-            <br><br>
-            There.
-            I said it.
-            `;
-
-
-        content.appendChild(confession);
-
-
-        setTimeout(() => {
-
-            confession.style.opacity =
-                "1";
-
-        }, 100);
-
-
-        await wait(1800);
-
-
-        const confusing =
-            document.createElement("div");
-
-        confusing.style.fontSize =
-            "15px";
-
-        confusing.style.lineHeight =
-            "1.7";
-
-        confusing.style.color =
-            "rgba(255,255,255,.7)";
-
-        confusing.innerHTML =
-            `
-            And before you start celebrating... 😌
-            <br>
-            I'm still going to annoy you.
-            <br><br>
-            So technically...
-            nothing has changed.
-            😂
-            `;
-
-
-        content.appendChild(confusing);
-
-
-        await wait(1600);
-
-
-        showFinalQuestion(answerType);
-
-    });
-
-}
-
-
-/* ==============================
-   FINAL QUESTION
-============================== */
-
-function showFinalQuestion(answerType) {
-
-    const finalBox =
-        document.createElement("div");
-
-    finalBox.style.marginTop =
-        "25px";
-
-    finalBox.style.padding =
-        "18px";
-
-    finalBox.style.borderRadius =
-        "16px";
-
-    finalBox.style.background =
-        "rgba(255,255,255,.06)";
-
-    finalBox.style.border =
-        "1px solid rgba(255,255,255,.1)";
-
-
-    const text =
-        document.createElement("div");
-
-    text.style.fontSize =
-        "18px";
-
-    text.style.fontWeight =
-        "bold";
-
-    text.innerHTML =
-        "So... what do you think? 👀";
-
-
-    finalBox.appendChild(text);
-
-
-    const buttonContainer =
-        document.createElement("div");
-
-    buttonContainer.className =
-        "choice-container";
-
-
-    const yes =
-        createChoiceButton(
-            "❤️ I knew it"
-        );
-
-    const maybe =
-        createChoiceButton(
-            "😏 I need to think"
-        );
-
-    const joke =
-        createChoiceButton(
-            "😂 You are so stupid"
-        );
-
-
-    buttonContainer.appendChild(yes);
-    buttonContainer.appendChild(maybe);
-    buttonContainer.appendChild(joke);
-
-
-    finalBox.appendChild(
-        buttonContainer
-    );
-
-
-    content.appendChild(
-        finalBox
-    );
-
-
-    yes.onclick = async () => {
-
-        await saveResponse(
-            "Final confession reaction",
-            "❤️ I knew it"
-        );
-
-        finish("yes");
-
-    };
-
-
-    maybe.onclick = async () => {
-
-        await saveResponse(
-            "Final confession reaction",
-            "😏 I need to think"
-        );
-
-        finish("maybe");
-
-    };
-
-
-    joke.onclick = async () => {
-
-        await saveResponse(
-            "Final confession reaction",
-            "😂 You are so stupid"
-        );
-
-        finish("joke");
-
-    };
-
-}
-
-
-/* ==============================
-   FINISH
-============================== */
-
-function finish(type) {
-
-    changeScreen(async () => {
-
-        title.innerHTML =
-            "Okay... that's enough. 😂❤️";
-
-        description.innerHTML =
-            "";
-
-        content.innerHTML =
-            "";
-
-
-        let message;
-
-
-        if (type === "yes") {
-
-            message =
-                `
-                <strong>Oh.</strong>
-                <br><br>
-                So you knew?
-                👀
-                <br><br>
-                And you still stayed until the end?
-                <br><br>
-                Interesting, Sru...
-                very interesting. 😌❤️
-                `;
-
-        }
-
-
-        if (type === "maybe") {
-
-            message =
-                `
-                <strong>Take your time. 😌</strong>
-                <br><br>
-                I'll be here...
-                pretending I'm not checking your answer.
-                👀
-                <br><br>
-                No pressure. ❤️
-                `;
-
-        }
-
-
-        if (type === "joke") {
-
-            message =
-                `
-                <strong>Wow. Rude. 😂</strong>
-                <br><br>
-                I just confessed my feelings
-                and this is the respect I get?
-                <br><br>
-                Unbelievable, Sru. 😭❤️
-                `;
-
-        }
-
-
-        const result =
-            document.createElement("div");
-
-        result.style.fontSize =
-            "17px";
-
-        result.style.lineHeight =
-            "1.7";
-
-        result.style.margin =
-            "20px 0";
-
-        result.innerHTML =
-            message;
-
-
-        content.appendChild(
-            result
-        );
-
-
-        await wait(1200);
-
-
-        const tiny =
-            document.createElement("p");
-
-        tiny.style.fontSize =
-            "13px";
-
-        tiny.style.color =
-            "rgba(255,255,255,.55)";
-
-        tiny.textContent =
-            "P.S. Yes, this entire website was made just to annoy you. 😌";
-
-
-        content.appendChild(
-            tiny
-        );
-
-
-        await wait(800);
-
-
-        const replay =
-            document.createElement("button");
-
-        replay.id =
-            "startButton";
-
-        replay.textContent =
-            "🔄 Make me suffer again";
-
-
-        replay.style.marginTop =
-            "20px";
-
-
-        replay.onclick = () => {
-
-            location.reload();
-
-        };
-
-
-        content.appendChild(
-            replay
-        );
-
-
-        createExtraHearts();
-
-    });
-
-}
-
-
-/* ==============================
-   EXTRA HEARTS
-============================== */
-
-function createExtraHearts() {
-
-    const hearts = [
-        "♡",
-        "♥",
-        "💗",
-        "💕",
-        "💖",
-        "❤️"
-    ];
-
-
-    for (let i = 0; i < 20; i++) {
-
-        const heart =
-            document.createElement("div");
-
-        heart.className =
-            "heart";
-
-        heart.textContent =
-            hearts[
-                Math.floor(
-                    Math.random() *
-                    hearts.length
-                )
-            ];
-
-
-        heart.style.position =
-            "fixed";
-
-        heart.style.left =
-            Math.random() * 100 + "vw";
-
-        heart.style.bottom =
-            "-40px";
-
-        heart.style.fontSize =
-            15 +
-            Math.random() * 28 +
-            "px";
-
-        heart.style.pointerEvents =
-            "none";
-
-        heart.style.zIndex =
-            "50";
-
-        heart.style.animation =
-            `floatHeart ${4 + Math.random() * 4}s linear forwards`;
-
-
-        document.body.appendChild(
-            heart
-        );
-
-
-        setTimeout(() => {
-
-            heart.remove();
-
-        }, 9000);
+        });
 
     }
+);
 
-}
+
+/* =========================================================
+   BUTTON RIPPLE EFFECT
+========================================================= */
+
+const buttons =
+    document.querySelectorAll(
+        ".btn, .contact-links a"
+    );
 
 
-/* ==============================
-   INITIAL PARTICLES
-============================== */
+buttons.forEach(button => {
 
-createParticles(18);
+    button.addEventListener(
+        "click",
+        function () {
+
+            this.style.transform =
+                "scale(0.97)";
+
+
+            setTimeout(() => {
+
+                this.style.transform =
+                    "";
+
+            }, 120);
+
+        }
+    );
+
+});
+
+
+/* =========================================================
+   PROJECT CARD TILT
+========================================================= */
+
+const projectCards =
+    document.querySelectorAll(
+        ".project-card"
+    );
+
+
+projectCards.forEach(card => {
+
+    card.addEventListener(
+        "mousemove",
+        event => {
+
+            if (
+                window.innerWidth < 850
+            ) {
+
+                return;
+
+            }
+
+
+            const rect =
+                card.getBoundingClientRect();
+
+
+            const x =
+                event.clientX -
+                rect.left;
+
+
+            const y =
+                event.clientY -
+                rect.top;
+
+
+            const centerX =
+                rect.width / 2;
+
+
+            const centerY =
+                rect.height / 2;
+
+
+            const rotateX =
+                ((y - centerY) /
+                    centerY) *
+                -2;
+
+
+            const rotateY =
+                ((x - centerX) /
+                    centerX) *
+                2;
+
+
+            card.style.transform =
+                `perspective(800px)
+                 rotateX(${rotateX}deg)
+                 rotateY(${rotateY}deg)
+                 translateY(-5px)`;
+
+        }
+    );
+
+
+    card.addEventListener(
+        "mouseleave",
+        () => {
+
+            card.style.transform =
+                "";
+
+        }
+    );
+
+});
+
+
+/* =========================================================
+   KEYBOARD SHORTCUT
+========================================================= */
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        /*
+           Press "/" to focus the page
+           without doing anything dangerous.
+        */
+
+        if (
+            event.key === "/" &&
+            document.activeElement.tagName !==
+            "INPUT" &&
+            document.activeElement.tagName !==
+            "TEXTAREA"
+        ) {
+
+            event.preventDefault();
+
+            window.scrollTo({
+
+                top: 0,
+
+                behavior: "smooth"
+
+            });
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   PAGE LOAD
+========================================================= */
+
+window.addEventListener(
+    "load",
+    () => {
+
+        document.body.classList.add(
+            "loaded"
+        );
+
+
+        console.log(
+            "🚀 Bandenawaz Korabu Portfolio loaded successfully!"
+        );
+
+
+        console.log(
+            "💻 Developer mode: ACTIVE"
+        );
+
+    }
+);

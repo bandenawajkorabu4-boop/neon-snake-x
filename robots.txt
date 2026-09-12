@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://bandenawajkorabu4-boop.github.io/about-my-self/sitemap.xml
